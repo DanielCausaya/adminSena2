@@ -18,8 +18,7 @@ class ConsultasController extends Controller
 
 
     $products = Product::with(['user.profile'])->get();
-        //$products = Product::all();
-        return $products;
+         return $products;
 
     }
 }

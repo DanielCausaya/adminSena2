@@ -9,9 +9,5 @@ class TrainingCenter extends Model
 {
     use HasFactory;
 
-      protected $fillable = [
-        'name',
-        'location',
-        
-    ];
+      protected $fillable = ['name','location'];
 }

@@ -9,9 +9,5 @@ class Computer extends Model
 {
     use HasFactory;
 
-      protected $fillable = [
-        'number',
-        'brand',
-        
-    ];
+      protected $fillable = ['number','brand'];
 }
