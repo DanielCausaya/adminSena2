@@ -2,49 +2,117 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Computer;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ComputerController extends Controller
 {
-    public function index()
+
+    private function rules(?Computer $computer = null): array
     {
-        return Computer::all();
+        $number = Rule::unique('computers', 'number');
+
+        if ($computer !== null) {
+            $number = $number->ignore($computer->getKey());
+        }
+
+        return [
+            'number' => ['required', 'string', 'max:255', $number],
+            'brand' => ['required', 'string', 'max:255'],
+        ];
     }
 
-    public function show(Computer $computer)
+
+    private function wantsApiResponse(Request $request): bool
     {
-        return response()->json($computer, 200);
+        return $request->expectsJson() || $request->is('v1/*');
+    }
+
+    public function index(Request $request)
+    {
+        $computers = Computer::orderBy('id')->get();
+
+        if ($this->wantsApiResponse($request)) {
+            return response()->json($computers, 200);
+        }
+
+        return view('computers.index', ['computers' => $computers->toArray()]);
+    }
+
+    public function create()
+    {
+        return view('computers.create');
+    }
+
+    public function show(Request $request, Computer $computer)
+    {
+        if ($this->wantsApiResponse($request)) {
+            return response()->json($computer, 200);
+        }
+
+        return view('computers.show', ['computer' => $computer->toArray()]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'serial_number' => 'required|string|unique:computers,serial_number'
-        ]);
+        $validated = $request->validate($this->rules());
 
-        $computer = Computer::create($request->all());
-        return response()->json($computer, 201);
+        $computer = Computer::create($validated);
+
+        if ($this->wantsApiResponse($request)) {
+            return response()->json($computer, 201);
+        }
+
+        return redirect()
+            ->route('computers.index')
+            ->with('success', 'Computador creado correctamente.');
+    }
+
+    public function edit(Computer $computer)
+    {
+        return view('computers.edit', ['computer' => $computer->toArray()]);
     }
 
     public function update(Request $request, Computer $computer)
     {
-        $request->validate([
-            'brand' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'serial_number' => 'required|string|unique:computers,serial_number,' . $computer->id
-        ]);
+        $validated = $request->validate($this->rules($computer));
 
-        $computer->update($request->all());
-        return response()->json($computer, 200);
+        $computer->update($validated);
+
+        if ($this->wantsApiResponse($request)) {
+            return response()->json($computer, 200);
+        }
+
+        return redirect()
+            ->route('computers.index')
+            ->with('success', 'Computador actualizado correctamente.');
     }
 
-    public function destroy(Computer $computer)
+    public function destroy(Request $request, Computer $computer)
     {
-        $computer->delete();
-        return response()->json(['message' => 'Computador eliminado correctamente'], 200);
+        try {
+            $computer->delete();
+        } catch (QueryException $e) {
+            // La FK apprentices.computer_id impide borrar un computador con aprendices.
+            if ($this->wantsApiResponse($request)) {
+                return response()->json([
+                    'message' => 'El computador tiene aprendices asignados y no se puede eliminar.',
+                ], 409);
+            }
+
+            return redirect()
+                ->route('computers.index')
+                ->with('error', 'El computador tiene aprendices asignados y no se puede eliminar.');
+        }
+
+        if ($this->wantsApiResponse($request)) {
+            return response()->json(['message' => 'Computador eliminado correctamente'], 200);
+        }
+
+        return redirect()
+            ->route('computers.index')
+            ->with('success', 'Computador eliminado correctamente.');
     }
 }

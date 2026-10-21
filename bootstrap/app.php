@@ -1,5 +1,11 @@
 <?php
 
+use App\Exceptions\Handler;
+use App\Http\Kernel;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Env;
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -11,7 +17,21 @@
 |
 */
 
-$app = new Illuminate\Foundation\Application(
+/*
+|--------------------------------------------------------------------------
+| Desactivar putenv
+|--------------------------------------------------------------------------
+|
+| Bajo XAMPP (mod_php) el putenv() que hace Dotenv al cargar el .env se
+| queda en el proceso del worker de Apache y contamina las peticiones
+| siguientes: el ClienteAdminSena terminaba pisando el DB_DATABASE de esta
+| API. Sin putenv, Laravel solo usa $_ENV/$_SERVER, que son por peticion.
+|
+*/
+
+Env::disablePutenv();
+
+$app = new Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
@@ -28,7 +48,7 @@ $app = new Illuminate\Foundation\Application(
 
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,
-    App\Http\Kernel::class
+    Kernel::class
 );
 
 $app->singleton(
@@ -37,8 +57,8 @@ $app->singleton(
 );
 
 $app->singleton(
-    Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
+    ExceptionHandler::class,
+    Handler::class
 );
 
 /*

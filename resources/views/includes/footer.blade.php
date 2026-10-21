@@ -1,26 +1,19 @@
-<!-- Contenido de la página de inicio, como el carrusel y otras secciones -->
-
-<!-- Footer -->
-<footer class="bg-dark text-white py-4">
+<footer class="bg-dark text-white py-4 mt-5">
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h5>Contacto</h5>
-                <p>Academia de Taekwondo<br>
-                Dirección: [Tu dirección]<br>
-                Teléfono: [Tu teléfono]<br>
-                Correo electrónico: [Tu correo electrónico]</p>
+                <h5>Admin SENA</h5>
+                <p class="mb-0">Panel de gestión de equipos de cómputo del SENA.</p>
             </div>
             <div class="col-md-6">
-                <h5>Síguenos</h5>
-                <ul class="list-inline">
-                    <li class="list-inline-item"><a href="[Enlace a Facebook]"><i class="fab fa-facebook"></i></a></li>
-                    <li class="list-inline-item"><a href="[Enlace a Twitter]"><i class="fab fa-twitter"></i></a></li>
-                    <li class="list-inline-item"><a href="[Enlace a Instagram]"><i class="fab fa-instagram"></i></a></li>
+                <h5>Navegación</h5>
+                <ul class="list-unstyled mb-0">
+                    <li><a class="link-light" href="{{ route('computers.index') }}">Computadores</a></li>
+                    <li><a class="link-light" href="{{ route('computer.create') }}">Crear computador</a></li>
                 </ul>
             </div>
         </div>
         <hr>
-        <p class="text-center">&copy; {{ date('Y') }} hola hijos.....</p>
+        <p class="text-center mb-0">&copy; {{ date('Y') }} Admin SENA</p>
     </div>
 </footer>

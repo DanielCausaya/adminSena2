@@ -1,0 +1,15 @@
+{
+    "validation.required": "El campo :attribute es obligatorio.",
+    "validation.string": "El campo :attribute debe ser un texto.",
+    "validation.max.string": "El campo :attribute no puede tener más de :max caracteres.",
+    "validation.integer": "El campo :attribute debe ser un número entero.",
+    "validation.numeric": "El campo :attribute debe ser un número.",
+    "validation.exists": "El :attribute seleccionado no existe.",
+    "validation.unique": "Ya existe un registro con ese :attribute.",
+    "validation.required_if": "El campo :attribute es obligatorio cuando :other es :value.",
+    "validation.accepted": "Debes aceptar el campo :attribute.",
+    "validation.email": "El campo :attribute debe ser un correo válido.",
+    "validation.url": "El campo :attribute debe ser una URL válida.",
+    "validation.min.string": "El campo :attribute debe tener al menos :min caracteres.",
+    "validation.numeric_min": "El campo :attribute debe ser al menos :min."
+}
