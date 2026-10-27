@@ -7,7 +7,7 @@
 
     @include('includes.alert-errors')
 
-    <form action="{{ route('computer.store') }}" method="POST" novalidate>
+    <form action="{{ route('computer.store') }}" method="POST" enctype="multipart/form-data" novalidate>
         @csrf
 
         <div class="mb-3">
@@ -26,6 +26,15 @@
                    class="form-control @error('brand') is-invalid @enderror"
                    value="{{ old('brand') }}" maxlength="255" required>
             @error('brand')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Imagen</label>
+            <input type="file" name="image" id="image" accept="image/*"
+                   class="form-control @error('image') is-invalid @enderror">
+            @error('image')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>

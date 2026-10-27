@@ -9,7 +9,6 @@ use Illuminate\Validation\Rule;
 
 class ComputerController extends Controller
 {
-
     private function rules(?Computer $computer = null): array
     {
         $number = Rule::unique('computers', 'number');
@@ -21,9 +20,23 @@ class ComputerController extends Controller
         return [
             'number' => ['required', 'string', 'max:255', $number],
             'brand' => ['required', 'string', 'max:255'],
+            'image' => ['nullable', 'image', 'max:5120'],
         ];
     }
 
+    private function subirImagen(Request $request, Computer $computer): void
+    {
+        if (! $request->hasFile('image')) {
+            return;
+        }
+
+        $subida = cloudinary()->upload($request->file('image')->getRealPath(), [
+            'folder' => 'computers',
+        ]);
+
+        $computer->image_url = $subida->getSecurePath();
+        $computer->save();
+    }
 
     private function wantsApiResponse(Request $request): bool
     {
@@ -59,7 +72,12 @@ class ComputerController extends Controller
     {
         $validated = $request->validate($this->rules());
 
-        $computer = Computer::create($validated);
+        $data = $validated;
+        unset($data['image']);
+
+        $computer = Computer::create($data);
+
+        $this->subirImagen($request, $computer);
 
         if ($this->wantsApiResponse($request)) {
             return response()->json($computer, 201);
@@ -79,7 +97,12 @@ class ComputerController extends Controller
     {
         $validated = $request->validate($this->rules($computer));
 
-        $computer->update($validated);
+        $data = $validated;
+        unset($data['image']);
+
+        $computer->update($data);
+
+        $this->subirImagen($request, $computer);
 
         if ($this->wantsApiResponse($request)) {
             return response()->json($computer, 200);
@@ -95,7 +118,6 @@ class ComputerController extends Controller
         try {
             $computer->delete();
         } catch (QueryException $e) {
-            // La FK apprentices.computer_id impide borrar un computador con aprendices.
             if ($this->wantsApiResponse($request)) {
                 return response()->json([
                     'message' => 'El computador tiene aprendices asignados y no se puede eliminar.',
